@@ -4,9 +4,9 @@ use tree_sitter::Node;
 
 use super::languages::Language;
 
-pub fn process_rust_code(code: &str) -> String {
+pub fn process_code(code: &str, language: &tree_sitter::Language) -> String {
 	let mut parser = tree_sitter::Parser::new();
-	parser.set_language(&tree_sitter_rust::LANGUAGE.into()).expect("Error loading Rust grammar");
+	parser.set_language(language).expect("Error loading grammar");
 	let tree = parser.parse(code, None).unwrap();
 
 	let mut output = String::new();
@@ -86,21 +86,19 @@ fn process_node_with_whitespace(node: Node, code: &str, output: &mut String, las
 	}
 }
 
-pub fn parse(language: Language, reader: &mut impl io::Read, writer: &mut impl io::Write) -> io::Result<()> {
+pub fn process(language: Language, reader: &mut impl io::Read, writer: &mut impl io::Write) -> io::Result<()> {
 	let mut code = String::new();
 	reader.read_to_string(&mut code)?;
 
-	match language {
-		Language::Rust => {
-			let processed = process_rust_code(&code);
-			writer.write_all(processed.as_bytes())?;
-			Ok(())
-		}
-		_ => {
-			// Fallback for other languages is to just copy the content
-			writer.write_all(code.as_bytes())
-		}
+	let tree_sitter_language = language.get_tree_sitter_language();
+	if tree_sitter_language.is_none() {
+		writer.write_all(code.as_bytes())?;
+		return Ok(());
 	}
+
+	let processed = process_code(&code, &tree_sitter_language.unwrap());
+	writer.write_all(processed.as_bytes())?;
+	Ok(())
 }
 
 #[cfg(test)]
@@ -110,7 +108,7 @@ mod tests {
 	use std::path::Path;
 
 	#[test]
-	fn test_parse_files() {
+	fn test_data_files() {
 		let test_data_dir = Path::new("src/parser/test_data");
 
 		// Find all .in files
@@ -138,7 +136,7 @@ mod tests {
 
 						// Process the input
 						let mut output = Vec::new();
-						parse(language, &mut input, &mut output).expect("Failed to parse");
+						process(language, &mut input, &mut output).expect("Failed to parse");
 
 						let actual = String::from_utf8(output).expect("Failed to convert output to string");
 

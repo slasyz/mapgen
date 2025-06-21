@@ -9,14 +9,14 @@ It is inspired by Aider.
 ## Usage
 
 ```bash
-mapgen [SOURCES] [-o|--output OUTPUT_FILE] [-w|--watch] [-d|(-d N)|(--depth N)]
+mapgen [SOURCES] [-o|--output OUTPUT_FILE] [-w|--watch] [-1|(-d N)|(--depth N)]
 ```
-- `[SOURCES]` — Paths to files or directories to generate map for.  Can be a single file, a directory, or a glob pattern.
+- `SOURCES` — Paths to files or directories to generate map for.  Can be a single file, a directory, or a glob pattern.
 - `-o OUTPUT_FILE` or `--output OUTPUT_FILE` — Output file to write map to.  If not specified, map will be printed to stdout.
 - `-w` or `--watch` — Watch for changes in sources and re-generate map on change.  Can only be used with the output file specified.
 - One of the following depth options:
   - nothing (default) — infinite recursive traversal;
-  - `-d` — only direct children of specified directory;
+  - `-1` — only direct children of specified directory;
   - `-d N` or `--depth N` — depth of the traversal.
 
 Examples:

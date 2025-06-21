@@ -13,6 +13,15 @@ impl Language {
 			_ => None,
 		}
 	}
+
+	pub fn get_tree_sitter_language(&self) -> Option<tree_sitter::Language> {
+		match self {
+			Language::Rust => Some(tree_sitter_rust::LANGUAGE.into()),
+			// Language::Go => tree_sitter_go::language(),
+			// Language::Js => tree_sitter_javascript::language(),
+			_ => None,
+		}
+	}
 }
 
 impl std::fmt::Debug for Language {
