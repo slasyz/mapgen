@@ -91,15 +91,15 @@ fn process_node(node: Node, code: &str, output: &mut String, last_end: &mut usiz
 	Ok(())
 }
 
-pub fn process(language: Language, reader: &mut impl io::Read, writer: &mut impl io::Write) -> io::Result<()> {
+pub fn process(language: Option<Language>, reader: &mut impl io::Read, writer: &mut impl io::Write) -> io::Result<()> {
 	let mut code = String::new();
 	reader.read_to_string(&mut code)?;
 
-	let tree_sitter_language = language.get_tree_sitter_language();
-	if tree_sitter_language.is_none() {
+	if language.is_none() {
 		writer.write_all(code.as_bytes())?;
 		return Ok(());
 	}
+	let language = language.unwrap();
 
 	let processed = process_code(&code, &language).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
 	writer.write_all(processed.as_bytes())?;
@@ -133,7 +133,7 @@ mod tests {
 						let lang_str = parts[0];
 						let num = parts[1].trim_end_matches(".in");
 
-						let language = Language::from_extension(lang_str).unwrap();
+						let language = Language::from_extension(lang_str);
 						let mut input = fs::File::open(&path).expect("Failed to open input file");
 
 						let out_path = test_data_dir.join(format!("{}-{}.out", lang_str, num));
