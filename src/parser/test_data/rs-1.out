@@ -1,0 +1,7 @@
+const FIZZ_NUMBER: i32 = 3;
+const BUZZ_NUMBER: i32 = 5;
+const MAX_COUNT: i32 = 100;
+const FIZZ_WORD: &str = "Fizz";
+const BUZZ_WORD: &str = "Buzz";
+
+fn main() { ... }

@@ -1,0 +1,12 @@
+[package]
+name = "mapgen"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "mapgen"
+path = "src/main.rs"
+
+[dependencies]
+tree-sitter = "0.25.6"
+tree-sitter-rust = "0.24.0"

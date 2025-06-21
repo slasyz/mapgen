@@ -1,0 +1,16 @@
+const FIZZ_NUMBER: i32 = 3;
+const BUZZ_NUMBER: i32 = 5;
+const MAX_COUNT: i32 = 100;
+const FIZZ_WORD: &str = "Fizz";
+const BUZZ_WORD: &str = "Buzz";
+
+fn main() {
+	for i in 1..=MAX_COUNT {
+		match (i % FIZZ_NUMBER == 0, i % BUZZ_NUMBER == 0) {
+			(true, true) => println!("{}{}", FIZZ_WORD, BUZZ_WORD),
+			(true, false) => println!("{}", FIZZ_WORD),
+			(false, true) => println!("{}", BUZZ_WORD),
+			(false, false) => println!("{}", i),
+		}
+	}
+}
