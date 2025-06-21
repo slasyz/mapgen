@@ -18,50 +18,45 @@ fn traverse_dir(path: &std::path::Path, depth: usize) -> Result<Vec<std::path::P
 	if !path.is_dir() {
 		return Err(format!("Path is neither file nor directory: {}", path.display()));
 	}
-	
+
 	let mut files: Vec<std::path::PathBuf> = Vec::new();
-	
+
 	for entry in std::fs::read_dir(path).map_err(|e| e.to_string())? {
 		let entry = entry.map_err(|e| e.to_string())?;
 		let entry_path = entry.path();
-		
+
 		if entry_path.is_file() {
 			files.push(entry_path);
 		} else if entry_path.is_dir() && depth > 1 {
 			files.extend(traverse_dir(&entry_path, depth - 1)?);
 		}
 	}
-	
+
 	Ok(files)
 }
 
 // Expands glob patterns, and after that keeps files and traverses directories recursively.
 pub fn get_files(sources: &[String], depth: usize) -> Result<Vec<std::path::PathBuf>, String> {
 	let mut all_files: Vec<std::path::PathBuf> = Vec::new();
-	
+
 	for source in sources {
 		// if it starts with ~, replace it with the home directory
-		let source = if source.starts_with('~') {
-			source.replace('~', &std::env::var("HOME").unwrap())
-		} else {
-			source.to_string()
-		};
+		let source = if source.starts_with('~') { source.replace('~', &std::env::var("HOME").unwrap()) } else { source.to_string() };
 
 		// Expand glob pattern
 		let glob_results = glob::glob(&source).map_err(|e| format!("Invalid glob pattern '{}': {}", source, e))?;
-		
+
 		for glob_result in glob_results {
 			let path = glob_result.map_err(|e| format!("Glob error: {}", e))?;
-			
+
 			// Use traverse_dir to handle both files and directories
 			let files = traverse_dir(&path, depth)?;
 			all_files.extend(files);
 		}
 	}
-	
+
 	Ok(all_files)
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -82,7 +77,7 @@ mod tests {
 		// Create temporary directory
 		let temp_dir = std::env::temp_dir().join("traverse_test");
 		if temp_dir.exists() {
-				fs::remove_dir_all(&temp_dir).unwrap();
+			fs::remove_dir_all(&temp_dir).unwrap();
 		}
 		fs::create_dir_all(&temp_dir).unwrap();
 
@@ -112,12 +107,7 @@ mod tests {
 	fn test_traverse_dir() {
 		let temp_dir = setup_test_directory();
 
-		let test_cases = vec![
-			(0, vec![]),
-			(1, vec!["file1.txt", "file2.txt"]),
-			(2, vec!["file1.txt", "file2.txt", "file3.txt", "file5.txt"]),
-			(3, vec!["file1.txt", "file2.txt", "file3.txt", "file4.txt", "file5.txt"]),
-		];
+		let test_cases = vec![(0, vec![]), (1, vec!["file1.txt", "file2.txt"]), (2, vec!["file1.txt", "file2.txt", "file3.txt", "file5.txt"]), (3, vec!["file1.txt", "file2.txt", "file3.txt", "file4.txt", "file5.txt"])];
 
 		for (depth, expected_files) in test_cases {
 			let result = traverse_dir(&temp_dir, depth).unwrap();
@@ -139,14 +129,7 @@ mod tests {
 		assert!(result.is_err());
 
 		// Sources, depth
-		let test_cases = vec![
-			(vec!["**/*.txt"], 1, vec!["file1.txt", "file2.txt", "file3.txt", "file4.txt", "file5.txt"]),
-			(vec!["*.txt"], 1, vec!["file1.txt", "file2.txt"]),
-			(vec![""], 1, vec!["file1.txt", "file2.txt"]),
-			(vec![""], 0, vec![]),
-			(vec!["file1.txt"], 1, vec!["file1.txt"]),
-			(vec!["*"], 1, vec!["file1.txt", "file2.txt", "file3.txt", "file5.txt"]),
-		];
+		let test_cases = vec![(vec!["**/*.txt"], 1, vec!["file1.txt", "file2.txt", "file3.txt", "file4.txt", "file5.txt"]), (vec!["*.txt"], 1, vec!["file1.txt", "file2.txt"]), (vec![""], 1, vec!["file1.txt", "file2.txt"]), (vec![""], 0, vec![]), (vec!["file1.txt"], 1, vec!["file1.txt"]), (vec!["*"], 1, vec!["file1.txt", "file2.txt", "file3.txt", "file5.txt"])];
 
 		for (patterns, depth, expected_files) in test_cases {
 			let patterns_abs: Vec<String> = patterns.iter().map(|p| format!("{}/{}", temp_dir.display(), p)).collect();

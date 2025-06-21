@@ -37,47 +37,10 @@ impl Language {
 
 	pub fn get_grammar(&self) -> Option<LanguageGrammar> {
 		match self {
-			Language::Rust => Some(LanguageGrammar {
-				function_specs: vec![
-					FunctionSpec {
-						function: "function_item",
-						function_body: "block",
-						replacement: "{ ... }",
-					}
-				],
-			}),
-			Language::Go => Some(LanguageGrammar {
-				function_specs: vec![
-					FunctionSpec {
-						function: "function_declaration",
-						function_body: "block",
-						replacement: "{ ... }",
-					},
-					FunctionSpec {
-						function: "method_declaration",
-						function_body: "block",
-						replacement: "{ ... }",
-					}
-				],
-			}),
-			Language::JavaScript => Some(LanguageGrammar {
-				function_specs: vec![
-					FunctionSpec {
-						function: "function_declaration",
-						function_body: "statement_block",
-						replacement: "{ ... }",
-					}
-				],
-			}),
-			Language::Python => Some(LanguageGrammar {
-				function_specs: vec![
-					FunctionSpec {
-						function: "function_definition",
-						function_body: "block",
-						replacement: "...",
-					}
-				],
-			}),
+			Language::Rust => Some(LanguageGrammar { function_specs: vec![FunctionSpec { function: "function_item", function_body: "block", replacement: "{ ... }" }] }),
+			Language::Go => Some(LanguageGrammar { function_specs: vec![FunctionSpec { function: "function_declaration", function_body: "block", replacement: "{ ... }" }, FunctionSpec { function: "method_declaration", function_body: "block", replacement: "{ ... }" }] }),
+			Language::JavaScript => Some(LanguageGrammar { function_specs: vec![FunctionSpec { function: "function_declaration", function_body: "statement_block", replacement: "{ ... }" }] }),
+			Language::Python => Some(LanguageGrammar { function_specs: vec![FunctionSpec { function: "function_definition", function_body: "block", replacement: "..." }] }),
 		}
 	}
 }

@@ -1,6 +1,6 @@
 mod cli;
-mod parser;
 mod files;
+mod parser;
 
 use clap::{CommandFactory, Parser};
 use cli::Cli;

@@ -95,7 +95,6 @@ fn process_node(node: Node, code: &str, output: &mut String, last_end: &mut usiz
 		}
 	}
 
-
 	Ok(())
 }
 
@@ -109,7 +108,7 @@ pub fn process(language: Option<Language>, reader: &mut impl io::Read, writer: &
 	}
 	let language = language.unwrap();
 
-	let processed = process_code(&code, &language).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+	let processed = process_code(&code, &language).map_err(std::io::Error::other)?;
 	writer.write_all(processed.as_bytes())?;
 	Ok(())
 }
