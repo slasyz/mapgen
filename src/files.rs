@@ -1,3 +1,6 @@
+/// List of directories that should be ignored during traversal
+const IGNORED_DIRS: &[&str] = &["node_modules", ".venv", "venv", "__pycache__", ".git", ".svn", ".hg", "target", "dist", "build", ".next", ".nuxt", ".output", "coverage", ".nyc_output", ".DS_Store", "Thumbs.db"];
+
 /// Returns a list of files in the directory.
 ///
 /// If depth is 0, return nothing.
@@ -17,6 +20,10 @@ fn traverse_dir(path: &std::path::Path, depth: usize) -> Result<Vec<std::path::P
 	}
 	if !path.is_dir() {
 		return Err(format!("Path is neither file nor directory: {}", path.display()));
+	}
+
+	if IGNORED_DIRS.contains(&path.file_name().unwrap().to_str().unwrap()) {
+		return Ok(vec![]);
 	}
 
 	let mut files: Vec<std::path::PathBuf> = Vec::new();

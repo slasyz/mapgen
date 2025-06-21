@@ -2,10 +2,37 @@ mod cli;
 mod files;
 mod parser;
 
+use std::io;
+use std::path::{Path, PathBuf};
+
 use clap::{CommandFactory, Parser};
 use cli::Cli;
 
 use crate::parser::Language;
+
+fn header(file: &Path) -> String {
+	format!("--------------------------------\nFile: {}\n--------------------------------\n", file.display())
+}
+
+fn once(files: Vec<PathBuf>, writer: &mut impl io::Write) {
+	for file in files {
+		writer.write_all(header(&file).as_bytes()).unwrap();
+
+		let language = Language::from_extension(file.extension().unwrap_or_default().to_str().unwrap());
+
+		let mut reader = std::fs::File::open(file).unwrap();
+		let result = parser::process::process(language, &mut reader, writer);
+		if result.is_err() {
+			eprintln!("Error: {}", result.err().unwrap());
+			std::process::exit(1);
+		}
+		writer.write_all(b"\n").unwrap();
+	}
+}
+
+fn watch(_files: Vec<PathBuf>, _writer: &mut impl io::Write) {
+	panic!("Not implemented");
+}
 
 fn main() {
 	let cli = Cli::parse();
@@ -26,19 +53,17 @@ fn main() {
 
 	let files = files::get_files(&cli.sources, depth).unwrap();
 
-	for file in files {
-		println!("--------------------------------");
-		println!("File: {}", file.display());
-		println!("--------------------------------");
-
-		let language = Language::from_extension(file.extension().unwrap_or_default().to_str().unwrap());
-
-		let mut reader = std::fs::File::open(file).unwrap();
-		let result = parser::process::process(language, &mut reader, &mut std::io::stdout());
-		if result.is_err() {
-			eprintln!("Error: {}", result.err().unwrap());
-			std::process::exit(1);
+	let mut writer: Box<dyn io::Write> = match cli.output {
+		Some(output) => {
+			let file = std::fs::File::create(output).unwrap();
+			Box::new(file)
 		}
-		println!();
+		None => Box::new(std::io::stdout()),
+	};
+
+	if cli.watch {
+		watch(files, &mut writer);
+	} else {
+		once(files, &mut writer);
 	}
 }

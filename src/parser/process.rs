@@ -102,6 +102,8 @@ pub fn process(language: Option<Language>, reader: &mut impl io::Read, writer: &
 	let mut code = String::new();
 	reader.read_to_string(&mut code)?;
 
+	// TODO: write "...binary file..." for binary files
+
 	if language.is_none() {
 		writer.write_all(code.as_bytes())?;
 		return Ok(());
