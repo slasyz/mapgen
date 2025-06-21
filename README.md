@@ -11,12 +11,12 @@ It is inspired by Aider.
 ```bash
 mapgen [SOURCES] [-o|--output OUTPUT_FILE] [-w|--watch] [-1|(-d N)|(--depth N)]
 ```
-- `SOURCES` — Paths to files or directories to generate map for.  Can be a single file, a directory, or a glob pattern.
+- `SOURCES` — Paths to files or directories to generate map for.  Can be a single file, a directory, or a glob pattern.  It can be both before and after all other options.
 - `-o OUTPUT_FILE` or `--output OUTPUT_FILE` — Output file to write map to.  If not specified, map will be printed to stdout.
 - `-w` or `--watch` — Watch for changes in sources and re-generate map on change.  Can only be used with the output file specified.
 - One of the following depth options:
   - nothing (default) — infinite recursive traversal;
-  - `-1` — only direct children of specified directory;
+  - `-1` — only direct children of specified directory, the same as `--depth 1`;
   - `-d N` or `--depth N` — depth of the traversal.
 
 Examples:
