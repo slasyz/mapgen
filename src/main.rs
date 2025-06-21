@@ -1,4 +1,6 @@
 mod cli;
+pub mod parser; // TODO: "pub" is temporary
+pub mod files;
 
 use clap::{CommandFactory, Parser};
 use cli::Cli;
