@@ -14,16 +14,16 @@ pub struct Cli {
     #[arg(short, long)]
     pub output: Option<String>,
 
-    /// Watch for changes in sources and re-generate map on change.
-    /// Can only be used with the output file specified.
-    #[arg(short, long)]
-    pub watch: bool,
-
     /// Max depth of the traversal.
     #[arg(short = 'd', long, value_name = "N", conflicts_with = "one_level")]
     pub depth: Option<usize>,
 
-    /// Only direct children of specified directory.  The same as `--depths 1`.
-    #[arg(short = '1', long, conflicts_with = "depth")]
+    /// Only direct children of specified directory.  The same as --depth 1.
+    #[arg(short = '1', conflicts_with = "depth")]
     pub one_level: bool,
+
+    /// Watch for changes in sources and re-generate map on change.
+    /// Can only be used with the output file specified.
+    #[arg(short, long)]
+    pub watch: bool,
 } 

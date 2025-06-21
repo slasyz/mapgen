@@ -14,5 +14,27 @@ fn main() {
 		std::process::exit(1);
 	}
 
-	println!("{:?}", cli);
+	let depth = if cli.one_level {
+		1
+	} else if cli.depth.is_some() {
+		cli.depth.unwrap()
+	} else {
+		999
+	};
+
+	let files = files::get_files(&cli.sources, depth).unwrap();
+
+	for file in files {
+		println!("--------------------------------");
+		println!("File: {}", file.display());
+		println!("--------------------------------");
+
+		let mut reader = std::fs::File::open(file).unwrap();
+		let result = parser::process::process(None, &mut reader, &mut std::io::stdout());
+		if result.is_err() {
+			eprintln!("Error: {}", result.err().unwrap());
+			std::process::exit(1);
+		}
+	}
+	println!("--------------------------------");
 }

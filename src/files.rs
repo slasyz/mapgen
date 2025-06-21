@@ -40,8 +40,15 @@ pub fn get_files(sources: &[String], depth: usize) -> Result<Vec<std::path::Path
 	let mut all_files: Vec<std::path::PathBuf> = Vec::new();
 	
 	for source in sources {
+		// if it starts with ~, replace it with the home directory
+		let source = if source.starts_with('~') {
+			source.replace('~', &std::env::var("HOME").unwrap())
+		} else {
+			source.to_string()
+		};
+
 		// Expand glob pattern
-		let glob_results = glob::glob(source).map_err(|e| format!("Invalid glob pattern '{}': {}", source, e))?;
+		let glob_results = glob::glob(&source).map_err(|e| format!("Invalid glob pattern '{}': {}", source, e))?;
 		
 		for glob_result in glob_results {
 			let path = glob_result.map_err(|e| format!("Glob error: {}", e))?;
