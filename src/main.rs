@@ -1,9 +1,11 @@
 mod cli;
-pub mod parser; // TODO: "pub" is temporary
-pub mod files;
+mod parser;
+mod files;
 
 use clap::{CommandFactory, Parser};
 use cli::Cli;
+
+use crate::parser::Language;
 
 fn main() {
 	let cli = Cli::parse();
@@ -29,12 +31,14 @@ fn main() {
 		println!("File: {}", file.display());
 		println!("--------------------------------");
 
+		let language = Language::from_extension(file.extension().unwrap_or_default().to_str().unwrap());
+
 		let mut reader = std::fs::File::open(file).unwrap();
-		let result = parser::process::process(None, &mut reader, &mut std::io::stdout());
+		let result = parser::process::process(language, &mut reader, &mut std::io::stdout());
 		if result.is_err() {
 			eprintln!("Error: {}", result.err().unwrap());
 			std::process::exit(1);
 		}
+		println!();
 	}
-	println!("--------------------------------");
 }
