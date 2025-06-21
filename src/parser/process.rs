@@ -4,86 +4,91 @@ use tree_sitter::Node;
 
 use super::languages::Language;
 
-pub fn process_code(code: &str, language: &tree_sitter::Language) -> String {
+pub fn process_code(code: &str, language: &Language) -> Result<String, String> {
 	let mut parser = tree_sitter::Parser::new();
-	parser.set_language(language).expect("Error loading grammar");
+
+	let tree_sitter_language = language.get_tree_sitter_language().ok_or("Error loading grammar")?;
+	parser.set_language(&tree_sitter_language).map_err(|e| e.to_string())?;
 	let tree = parser.parse(code, None).unwrap();
 
 	let mut output = String::new();
 	let mut last_end = 0;
 
-	process_node_with_whitespace(tree.root_node(), code, &mut output, &mut last_end);
+	process_node(tree.root_node(), code, &mut output, &mut last_end, language)?;
 
 	// Add any remaining text after the last node
 	if last_end < code.len() {
 		output.push_str(&code[last_end..]);
 	}
 
-	output
+	Ok(output)
 }
 
-fn process_node_with_whitespace(node: Node, code: &str, output: &mut String, last_end: &mut usize) {
+fn process_node(node: Node, code: &str, output: &mut String, last_end: &mut usize, language: &Language) -> Result<(), String> {
 	let start = node.start_byte();
 	let end = node.end_byte();
 
 	// Add any whitespace/text between the last processed position and this node
 	if start > *last_end {
-		// println!("adding whitespace: ***{:?}***", &code[*last_end..start]);
 		output.push_str(&code[*last_end..start]);
 		*last_end = start;
 	}
 
-	match node.kind() {
-		"function_item" => {
-			// For functions, find where the body starts
+	// Uncomment this when adding new languages to see the node types.
+	println!("node {:?}: {:?}", node.kind(), &code[start..end]);
+
+	let grammar = language.get_grammar().ok_or("Error loading grammar")?;
+
+	if node.kind() == grammar.function {
+		// For functions, find where the body starts
+		let mut cursor = node.walk();
+		cursor.goto_first_child();
+
+		let mut body_start = end; // fallback
+
+		// Find the block (function body)
+		loop {
+			let child = cursor.node();
+			if child.kind() == grammar.function_body {
+				body_start = child.start_byte();
+				break;
+			}
+
+			if !cursor.goto_next_sibling() {
+				break;
+			}
+		}
+
+		// Include everything up to the body
+		output.push_str(&code[start..body_start]);
+		// Replace body with placeholder
+		output.push_str(grammar.replacement);
+
+		*last_end = end;
+	} else {
+		// For non-function nodes, process children recursively
+		if node.child_count() == 0 {
+			// Leaf node - include its text
+			let text = &code[start..end];
+			// println!("adding leaf node: ***{:?}***", text);
+			output.push_str(text);
+			*last_end = end;
+		} else {
+			// Process all children
 			let mut cursor = node.walk();
 			cursor.goto_first_child();
 
-			let mut body_start = end; // fallback
-
-			// Find the block (function body)
 			loop {
-				let child = cursor.node();
-				if child.kind() == "block" {
-					body_start = child.start_byte();
-					break;
-				}
+				process_node(cursor.node(), code, output, last_end, language)?;
 
 				if !cursor.goto_next_sibling() {
 					break;
 				}
 			}
-
-			// Include everything up to the body
-			output.push_str(&code[start..body_start]);
-			// Replace body with placeholder
-			output.push_str("{ ... }");
-
-			*last_end = end;
-		}
-		_ => {
-			// For non-function nodes, process children recursively
-			if node.child_count() == 0 {
-				// Leaf node - include its text
-				let text = &code[start..end];
-				// println!("adding leaf node: ***{:?}***", text);
-				output.push_str(text);
-				*last_end = end;
-			} else {
-				// Process all children
-				let mut cursor = node.walk();
-				cursor.goto_first_child();
-
-				loop {
-					process_node_with_whitespace(cursor.node(), code, output, last_end);
-
-					if !cursor.goto_next_sibling() {
-						break;
-					}
-				}
-			}
 		}
 	}
+
+	Ok(())
 }
 
 pub fn process(language: Language, reader: &mut impl io::Read, writer: &mut impl io::Write) -> io::Result<()> {
@@ -96,7 +101,7 @@ pub fn process(language: Language, reader: &mut impl io::Read, writer: &mut impl
 		return Ok(());
 	}
 
-	let processed = process_code(&code, &tree_sitter_language.unwrap());
+	let processed = process_code(&code, &language).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
 	writer.write_all(processed.as_bytes())?;
 	Ok(())
 }

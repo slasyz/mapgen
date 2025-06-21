@@ -1,0 +1,14 @@
+FIZZ_NUMBER = 3
+BUZZ_NUMBER = 5
+MAX_COUNT = 100
+FIZZ_WORD = "Fizz"
+BUZZ_WORD = "Buzz"
+
+def fizz_buzz(max_count=MAX_COUNT, fizz_num=FIZZ_NUMBER, buzz_num=BUZZ_NUMBER, fizz_word=FIZZ_WORD, buzz_word=BUZZ_WORD):
+    ...
+
+# Call with default values (uses constants)
+fizz_buzz()
+
+# Or with custom values
+fizz_buzz(50, 3, 7, "Foo", "Bar")

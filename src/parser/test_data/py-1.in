@@ -1,0 +1,22 @@
+FIZZ_NUMBER = 3
+BUZZ_NUMBER = 5
+MAX_COUNT = 100
+FIZZ_WORD = "Fizz"
+BUZZ_WORD = "Buzz"
+
+def fizz_buzz(max_count=MAX_COUNT, fizz_num=FIZZ_NUMBER, buzz_num=BUZZ_NUMBER, fizz_word=FIZZ_WORD, buzz_word=BUZZ_WORD):
+    for i in range(1, max_count + 1):
+        if i % fizz_num == 0 and i % buzz_num == 0:
+            print(fizz_word + buzz_word)
+        elif i % fizz_num == 0:
+            print(fizz_word)
+        elif i % buzz_num == 0:
+            print(buzz_word)
+        else:
+            print(i)
+
+# Call with default values (uses constants)
+fizz_buzz()
+
+# Or with custom values
+fizz_buzz(50, 3, 7, "Foo", "Bar")

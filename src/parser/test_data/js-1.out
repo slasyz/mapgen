@@ -1,0 +1,13 @@
+const FIZZ_NUMBER = 3;
+const BUZZ_NUMBER = 5;
+const MAX_COUNT = 100;
+const FIZZ_WORD = "Fizz";
+const BUZZ_WORD = "Buzz";
+
+function fizzBuzz(maxCount = MAX_COUNT, fizzNum = FIZZ_NUMBER, buzzNum = BUZZ_NUMBER, fizzWord = FIZZ_WORD, buzzWord = BUZZ_WORD) { ... }
+
+// Call with default values (uses constants)
+fizzBuzz();
+
+// Or with custom values
+fizzBuzz(50, 3, 7, "Foo", "Bar");
