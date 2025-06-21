@@ -1,0 +1,42 @@
+package main
+
+import "fmt"
+
+const (
+	FIZZ_NUMBER = 3
+	BUZZ_NUMBER = 5
+	MAX_COUNT   = 100
+	FIZZ_WORD   = "Fizz"
+	BUZZ_WORD   = "Buzz"
+)
+
+type FizzBuzzer struct {
+	fizzNumber int
+	buzzNumber int
+	maxCount   int
+}
+
+func (f *FizzBuzzer) Do() {
+	for i := 1; i <= f.maxCount; i++ {
+		switch {
+		case i%f.fizzNumber == 0 && i%f.buzzNumber == 0:
+			fmt.Println(FIZZ_WORD + BUZZ_WORD)
+		case i%f.fizzNumber == 0:
+			fmt.Println(FIZZ_WORD)
+		case i%f.buzzNumber == 0:
+			fmt.Println(BUZZ_WORD)
+		default:
+			fmt.Println(i)
+		}
+	}
+}
+
+func main() {
+	fb := &FizzBuzzer{
+		fizzNumber: FIZZ_NUMBER,
+		buzzNumber: BUZZ_NUMBER,
+		maxCount:   MAX_COUNT,
+	}
+
+	fb.Do()
+}

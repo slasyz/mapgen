@@ -1,0 +1,21 @@
+package main
+
+import "fmt"
+
+const (
+	FIZZ_NUMBER = 3
+	BUZZ_NUMBER = 5
+	MAX_COUNT   = 100
+	FIZZ_WORD   = "Fizz"
+	BUZZ_WORD   = "Buzz"
+)
+
+type FizzBuzzer struct {
+	fizzNumber int
+	buzzNumber int
+	maxCount   int
+}
+
+func (f *FizzBuzzer) Do() { ... }
+
+func main() { ... }

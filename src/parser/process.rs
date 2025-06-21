@@ -35,37 +35,44 @@ fn process_node(node: Node, code: &str, output: &mut String, last_end: &mut usiz
 	}
 
 	// Uncomment this when adding new languages to see the node types.
-	println!("node {:?}: {:?}", node.kind(), &code[start..end]);
+	// println!("node {:?}: {:?}", node.kind(), &code[start..end]);
 
 	let grammar = language.get_grammar().ok_or("Error loading grammar")?;
 
-	if node.kind() == grammar.function {
-		// For functions, find where the body starts
-		let mut cursor = node.walk();
-		cursor.goto_first_child();
+	let mut is_function = false;
 
-		let mut body_start = end; // fallback
+	for function_spec in grammar.function_specs {
+		if node.kind() == function_spec.function {
+			is_function = true;
 
-		// Find the block (function body)
-		loop {
-			let child = cursor.node();
-			if child.kind() == grammar.function_body {
-				body_start = child.start_byte();
-				break;
+			// For functions, find where the body starts
+			let mut cursor = node.walk();
+			cursor.goto_first_child();
+
+			let mut body_start = end; // fallback
+
+			// Find the block (function body)
+			loop {
+				let child = cursor.node();
+				if child.kind() == function_spec.function_body {
+					body_start = child.start_byte();
+					break;
+				}
+
+				if !cursor.goto_next_sibling() {
+					break;
+				}
 			}
 
-			if !cursor.goto_next_sibling() {
-				break;
-			}
+			// Include everything up to the body
+			output.push_str(&code[start..body_start]);
+			// Replace body with placeholder
+			output.push_str(function_spec.replacement);
+
+			*last_end = end;
 		}
-
-		// Include everything up to the body
-		output.push_str(&code[start..body_start]);
-		// Replace body with placeholder
-		output.push_str(grammar.replacement);
-
-		*last_end = end;
-	} else {
+	}
+	if !is_function {
 		// For non-function nodes, process children recursively
 		if node.child_count() == 0 {
 			// Leaf node - include its text
@@ -87,6 +94,7 @@ fn process_node(node: Node, code: &str, output: &mut String, last_end: &mut usiz
 			}
 		}
 	}
+
 
 	Ok(())
 }

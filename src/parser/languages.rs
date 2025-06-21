@@ -5,10 +5,14 @@ pub enum Language {
 	Python,
 }
 
-pub struct LanguageGrammar {
+pub struct FunctionSpec {
 	pub function: &'static str,
 	pub function_body: &'static str,
 	pub replacement: &'static str,
+}
+
+pub struct LanguageGrammar {
+	pub function_specs: Vec<FunctionSpec>,
 }
 
 impl Language {
@@ -34,24 +38,45 @@ impl Language {
 	pub fn get_grammar(&self) -> Option<LanguageGrammar> {
 		match self {
 			Language::Rust => Some(LanguageGrammar {
-				function: "function_item",
-				function_body: "block",
-				replacement: "{ ... }",
+				function_specs: vec![
+					FunctionSpec {
+						function: "function_item",
+						function_body: "block",
+						replacement: "{ ... }",
+					}
+				],
 			}),
 			Language::Go => Some(LanguageGrammar {
-				function: "function_declaration",
-				function_body: "block",
-				replacement: "{ ... }",
+				function_specs: vec![
+					FunctionSpec {
+						function: "function_declaration",
+						function_body: "block",
+						replacement: "{ ... }",
+					},
+					FunctionSpec {
+						function: "method_declaration",
+						function_body: "block",
+						replacement: "{ ... }",
+					}
+				],
 			}),
 			Language::JavaScript => Some(LanguageGrammar {
-				function: "function_declaration",
-				function_body: "statement_block",
-				replacement: "{ ... }",
+				function_specs: vec![
+					FunctionSpec {
+						function: "function_declaration",
+						function_body: "statement_block",
+						replacement: "{ ... }",
+					}
+				],
 			}),
 			Language::Python => Some(LanguageGrammar {
-				function: "function_definition",
-				function_body: "block",
-				replacement: "...",
+				function_specs: vec![
+					FunctionSpec {
+						function: "function_definition",
+						function_body: "block",
+						replacement: "...",
+					}
+				],
 			}),
 		}
 	}
