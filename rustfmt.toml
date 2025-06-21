@@ -1,0 +1,4 @@
+max_width = 10000
+hard_tabs = true
+newline_style = "Unix"
+use_small_heuristics = "Default"

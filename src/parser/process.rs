@@ -1,35 +1,12 @@
 use std::io;
 
-use tree_sitter::{Node};
+use tree_sitter::Node;
 
-pub enum Language {
-	Rust,
-	Go,
-	Js,
-}
-
-impl Language {
-	pub fn from_extension(ext: &str) -> Option<Self> {
-		match ext {
-			"rs" => Some(Self::Rust),
-			"go" => Some(Self::Go),
-			"js" => Some(Self::Js),
-			_ => None,
-		}
-	}
-}
-
-impl std::fmt::Debug for Language {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "{:?}", self)
-	}
-}
+use super::languages::Language;
 
 pub fn process_rust_code(code: &str) -> String {
 	let mut parser = tree_sitter::Parser::new();
-	parser
-		.set_language(&tree_sitter_rust::LANGUAGE.into())
-		.expect("Error loading Rust grammar");
+	parser.set_language(&tree_sitter_rust::LANGUAGE.into()).expect("Error loading Rust grammar");
 	let tree = parser.parse(code, None).unwrap();
 
 	let mut output = String::new();
@@ -109,12 +86,7 @@ fn process_node_with_whitespace(node: Node, code: &str, output: &mut String, las
 	}
 }
 
-
-pub fn parse(
-	language: Language,
-	reader: &mut impl io::Read,
-	writer: &mut impl io::Write,
-) -> io::Result<()> {
+pub fn parse(language: Language, reader: &mut impl io::Read, writer: &mut impl io::Write) -> io::Result<()> {
 	let mut code = String::new();
 	reader.read_to_string(&mut code)?;
 
@@ -131,7 +103,6 @@ pub fn parse(
 	}
 }
 
-
 #[cfg(test)]
 mod tests {
 	use super::*;
@@ -141,36 +112,36 @@ mod tests {
 	#[test]
 	fn test_parse_files() {
 		let test_data_dir = Path::new("src/parser/test_data");
-		
+
 		// Find all .in files
 		let entries = fs::read_dir(test_data_dir).expect("Failed to read test_data directory");
-		
+
 		for entry in entries {
 			let entry = entry.expect("Failed to read directory entry");
 			let path = entry.path();
-			
+
 			if let Some(extension) = path.extension() {
 				if extension == "in" {
 					// Extract language and number from filename (e.g., "rs-1.in" -> "rs", "1")
 					let filename = path.file_name().unwrap().to_str().unwrap();
 					let parts: Vec<&str> = filename.split('-').collect();
-					
+
 					if parts.len() == 2 {
 						let lang_str = parts[0];
 						let num = parts[1].trim_end_matches(".in");
-						
+
 						let language = Language::from_extension(lang_str).unwrap();
 						let mut input = fs::File::open(&path).expect("Failed to open input file");
 
 						let out_path = test_data_dir.join(format!("{}-{}.out", lang_str, num));
 						let expected = fs::read_to_string(&out_path).expect("Failed to read expected output");
-						
+
 						// Process the input
 						let mut output = Vec::new();
 						parse(language, &mut input, &mut output).expect("Failed to parse");
-						
+
 						let actual = String::from_utf8(output).expect("Failed to convert output to string");
-						
+
 						// Compare results
 						assert_eq!(actual, expected, "Mismatch for file {}", filename);
 					}

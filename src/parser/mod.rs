@@ -1,3 +1,5 @@
-pub mod parser;
+pub mod languages;
+pub mod process;
 
-pub use parser::Language;
+pub use languages::Language;
+pub use process::parse;
