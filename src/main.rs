@@ -43,13 +43,7 @@ fn main() {
 		std::process::exit(1);
 	}
 
-	let depth = if cli.one_level {
-		1
-	} else if cli.depth.is_some() {
-		cli.depth.unwrap()
-	} else {
-		999
-	};
+	let depth = cli.depth.unwrap_or(99999);
 
 	let files = files::get_files(&cli.sources, depth).unwrap();
 
