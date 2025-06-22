@@ -7,7 +7,7 @@ Features:
 - [x] Generate a map of a directory/glob using CLI to stdout
 - [x] Generate a map of a file/directory/glob using CLI to a file
 - [ ] Generate a map of a file/directory/glob using CLI to a file with watch mode
-- [ ] Make it async
+- [ ] Make it async to be truly blazing fast
 - [ ] Add more languages
 - [ ] GUI
 
