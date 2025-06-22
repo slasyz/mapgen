@@ -11,6 +11,9 @@ Features:
 - [ ] Add more languages
 - [ ] GUI
 
+Improvements:
+- [ ] Keep docstrings in Python
+
 Packing:
 - [ ] CLI - GitHub Releases
 - [ ] GUI — Neutralino/Tauri (bun)

@@ -6,7 +6,7 @@ use clap::Parser;
 pub struct Cli {
 	/// Paths to files or directories to generate map for.
 	/// Can be a single file, a directory, or a glob pattern.
-	#[arg(required = false)]
+	#[arg(required = true)]
 	pub sources: Vec<String>,
 
 	/// Output file to write map to.

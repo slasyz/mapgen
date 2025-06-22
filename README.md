@@ -4,7 +4,9 @@ This is a tool for generating map of a code repository.
 
 Map is a shorter representation of code, that includes everything except functions content.  It is used to fed it to an AI agent as a context.
 
-It is inspired by Aider.
+It is inspired by Aider's [repository map](https://aider.chat/docs/repomap.html) and [Shotgun](https://github.com/glebkudr/shotgun_code) tool.
+
+![Example](example.jpg)
 
 ## Usage
 
