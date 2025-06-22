@@ -44,6 +44,12 @@ After that, just run this to build and run the project:
 cargo run -- "**/*.rs"
 ```
 
+Or build it and copy to some directory in `$PATH`:
+```bash
+cargo build --release
+cp target/release/mapgen ~/.local/bin/mapgen
+```
+
 ### Adding new languages
 
 To add a new language support, just do this:
